@@ -6,7 +6,7 @@
 #include <netdb.h>
 #include <unistd.h>
 
-#define API_KEY "Your API key"
+#define API_KEY "3e5843c556e5c0ede4405b6ae56c63e8"
 #define API_HOST "api.openweathermap.org"
 #define API_PATH "/data/2.5/weather"
 #define BUFFER_SIZE 1024
