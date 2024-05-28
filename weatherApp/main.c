@@ -11,12 +11,14 @@
 #define API_PATH "/data/2.5/weather"
 #define BUFFER_SIZE 1024
 
-void handleError(const char *msg) {
+void handleError(const char *msg)
+{
     perror(msg);
     exit(EXIT_FAILURE);
 }
 
-void printWeatherInfo(const char *json) {
+void printWeatherInfo(const char *json)
+{
     // Parse JSON manually and extract relevant information
     char *start = strstr(json, "\"main\":\"") + strlen("\"main\":\"");
     char *end = strchr(start, '"');
@@ -39,22 +41,26 @@ void printWeatherInfo(const char *json) {
     printf("Country: %.*s\n", (int)(end - start), start);
 }
 
-void parseHTTPResponse(int sockfd) {
+void parseHTTPResponse(int sockfd)
+{
     // Receive and display the HTTP response
     char buffer[BUFFER_SIZE];
     ssize_t bytes_received;
-    while ((bytes_received = recv(sockfd, buffer, BUFFER_SIZE - 1, 0)) > 0) {
+    while ((bytes_received = recv(sockfd, buffer, BUFFER_SIZE - 1, 0)) > 0)
+    {
         buffer[bytes_received] = '\0';
         // Check if the response contains the JSON data
         char *json_start = strstr(buffer, "{");
-        if (json_start != NULL) {
+        if (json_start != NULL)
+        {
             printWeatherInfo(json_start);
             break; // Stop reading further data after parsing JSON
         }
     }
 
     // Check for receive errors
-    if (bytes_received < 0) {
+    if (bytes_received < 0)
+    {
         handleError("Error: Unable to receive response");
     }
 
@@ -62,16 +68,19 @@ void parseHTTPResponse(int sockfd) {
     close(sockfd);
 }
 
-void getWeather(char *location) {
+void getWeather(char *location)
+{
     // Create a TCP socket
     int sockfd = socket(AF_INET, SOCK_STREAM, 0);
-    if (sockfd < 0) {
+    if (sockfd < 0)
+    {
         handleError("Error: Unable to create socket");
     }
 
     // Resolve server address
     struct hostent *server = gethostbyname(API_HOST);
-    if (server == NULL) {
+    if (server == NULL)
+    {
         handleError("Error: Unable to resolve server address");
     }
 
@@ -83,7 +92,8 @@ void getWeather(char *location) {
     server_addr.sin_port = htons(80);
 
     // Connect to the server
-    if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0) {
+    if (connect(sockfd, (struct sockaddr *)&server_addr, sizeof(server_addr)) < 0)
+    {
         handleError("Error: Unable to connect to server");
     }
 
@@ -92,7 +102,8 @@ void getWeather(char *location) {
     snprintf(request, BUFFER_SIZE, "GET %s?q=%s&appid=%s HTTP/1.1\r\nHost: %s\r\nConnection: close\r\n\r\n", API_PATH, location, API_KEY, API_HOST);
 
     // Send the HTTP request
-    if (send(sockfd, request, strlen(request), 0) < 0) {
+    if (send(sockfd, request, strlen(request), 0) < 0)
+    {
         handleError("Error: Unable to send request");
     }
 
@@ -100,7 +111,8 @@ void getWeather(char *location) {
     parseHTTPResponse(sockfd);
 }
 
-int main() {
+int main()
+{
     char location[100];
 
     // Get user input for location
